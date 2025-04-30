@@ -1,12 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
 
-// MongoDB connection string
 const uri = process.env.MONGODB_URI || '';
 
-// Fix the type definition to match Next.js 15.2.1 requirements
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   let client = null;
@@ -15,17 +13,12 @@ export async function GET(
     console.log('Attempting to connect to MongoDB...');
     console.log('Fetching blog with ID:', params.id);
 
-    // Create a new client
     client = new MongoClient(uri, {
       serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
-      },
-      tls: true,
-      tlsAllowInvalidCertificates: false,
-      connectTimeoutMS: 30000,
-      socketTimeoutMS: 45000,
+      }
     });
 
     await client.connect();
@@ -57,9 +50,8 @@ export async function GET(
   }
 }
 
-// Add PUT handler for updating a blog post
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   let client = null;
@@ -129,9 +121,8 @@ export async function PUT(
   }
 }
 
-// Add DELETE handler for removing a blog post
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   let client = null;
