@@ -3,15 +3,17 @@ import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
 
 const uri = process.env.MONGODB_URI || '';
 
+// Update the type definition to match Next.js 15.2.1 requirements
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: { params: { id: string } }
 ) {
   let client = null;
+  const { id } = context.params;
 
   try {
     console.log('Attempting to connect to MongoDB...');
-    console.log('Fetching blog with ID:', params.id);
+    console.log('Fetching blog with ID:', id);
 
     client = new MongoClient(uri, {
       serverApi: {
@@ -28,7 +30,7 @@ export async function GET(
     const collection = database.collection('blogs');
 
     // Fetch the blog by ID
-    const blog = await collection.findOne({ _id: new ObjectId(params.id) });
+    const blog = await collection.findOne({ _id: new ObjectId(id) });
     
     if (!blog) {
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
@@ -50,14 +52,16 @@ export async function GET(
   }
 }
 
+// Update PUT handler
 export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: { params: { id: string } }
 ) {
   let client = null;
-
+  const { id } = context.params;
+  
   try {
-    console.log('Attempting to update blog with ID:', params.id);
+    console.log('Attempting to update blog with ID:', id);
     const body = await request.json();
     const { title, content, author, tags, featuredImage } = body;
 
@@ -94,7 +98,7 @@ export async function PUT(
 
     // Update the blog
     const result = await collection.updateOne(
-      { _id: new ObjectId(params.id) },
+      { _id: new ObjectId(id) },
       updateData
     );
 
@@ -121,14 +125,16 @@ export async function PUT(
   }
 }
 
+// Update DELETE handler
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: { params: { id: string } }
 ) {
   let client = null;
-
+  const { id } = context.params;
+  
   try {
-    console.log('Attempting to delete blog with ID:', params.id);
+    console.log('Attempting to delete blog with ID:', id);
 
     // Create a new client
     client = new MongoClient(uri, {
@@ -150,7 +156,7 @@ export async function DELETE(
     const collection = database.collection('blogs');
 
     // Delete the blog
-    const result = await collection.deleteOne({ _id: new ObjectId(params.id) });
+    const result = await collection.deleteOne({ _id: new ObjectId(id) });
 
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
